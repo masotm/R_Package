@@ -1,0 +1,41 @@
+Package: BacktastingTools
+
+Type: Package
+
+Title: The package provides algorithms to create and backtest a strategy
+
+Version: 1.0
+
+Date: 2020-06-12
+
+Author: Agnelli Lorenzo, Marenghi Luca, Masotto Matteo
+
+Maintainer: <agnell@usi.ch>
+
+Description: The user, with this package, has a pool of functions that will run for him two different typology of trading strategies (Momentum and BAB) on time series given in input with the possibility to code a user made strategy. In addition the user has also the chance to backtest the builded strategy and get some useful statistics.
+
+Guide To Create User-Personal-Function:
+>fuser <-function(date,prices,freq,holdingperiod, "other eventual argument used for the statistic"){ 
+  retper<- f.rendperc(prices)  #make the return if needed
+  
+  r<- estimateextractor(retper,holdingperiod,freq)
+
+  d<- estimateextractor(date[-1],holdingperiod,freq)
+
+  da<-d[[1]][length(d[[1]])] 
+  estimation <-Stat(r[[1]])  #use any statistics applied to every column of the first element of the list
+  for (i in 2:length(d)) {
+    da<-c(da,d[[i]][length(d[[i]])])
+    estimation <-rbind(estimation , Stat(r[[1]]) ) 
+  }
+
+  l<-list(beta,da)
+  names(l)<-c("mtx","date") 
+  return(l) 
+#the return is a list with time series of the chosen statistics for every row that 
+#corresponds to a different asset
+}
+
+#finally you can test your strategy with the function
+backtestfunction(prices, date, f = fuser, percentile = percentile , freq = freq, holdingperiod = holdingperiod , long = T , short = T, other eventual argument used for the statistic = x, revert = T ) #use revert
+
